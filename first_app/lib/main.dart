@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demoo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(title: 'Pop Cat'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key? key, required this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+  Image cat = Image.asset(
+    'assets/popcat2.png',
+    width: 120,
+  );
+  Image cat1 = Image.asset(
+    'assets/popcat1.png',
+    width: 120,
+  );
+  Image cat2 = Image.asset(
+    'assets/popcat2.png',
+    width: 120,
+  );
+
+  void _incrementCounter() {
+    setState(() {
+      // เอาตัวแปรไปเก็บไว้ ละคืนค่าที่เก็บไว้มา หลังจาก reset แล้ว ต้องใส่เสมอเวลามีค่าเปลี่ยนแปลง
+      cat = cat2;
+      _counter++;
+    });
+  }
+
+  void _decreaseCounter() {
+    setState(() {
+      cat = cat1;
+      // เอาตัวแปรไปเก็บไว้ ละคืนค่าที่เก็บไว้มา หลังจาก reset แล้ว ต้องใส่เสมอเวลามีค่าเปลี่ยนแปลง
+      _counter--;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, //start , end
+          children: <Widget>[
+            cat,
+            Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+            //,SubmitButton("Firstbutton"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: _decreaseCounter,
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.green,
+                  ),
+                  child: Text('Decrease'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.red,
+                  ),
+                  onPressed: _incrementCounter,
+                  child: Text('Increase'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: Icon(Icons.access_alarm),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class SubmitButton extends StatelessWidget {
+  final String buttonText;
+  SubmitButton(this.buttonText);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: Text(this.buttonText),
+      onPressed: () {
+        print("presse");
+      },
+    );
+  }
+}
