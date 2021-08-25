@@ -8,12 +8,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demoo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Pop Cat'),
-    );
+        title: 'Flutter Demoo',
+        theme: ThemeData(
+            primarySwatch: Colors.blue,
+            accentColor: Colors.red,
+            textTheme: TextTheme(bodyText2: TextStyle(color: Colors.purple))),
+        //home: MyHomePage(title: 'Pop Cat'),
+        initialRoute: '/fourth',
+        routes: <String, WidgetBuilder>{
+          '/first': (context) => FirstPage(),
+          '/secound': (context) => SecoundPage(),
+          '/thrid': (context) => ThridPage(),
+          '/fourth': (context) => FourthPage()
+        });
   }
 }
 
@@ -67,7 +74,16 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center, //start , end
           children: <Widget>[
-            cat,
+            Container(
+              height: 150.0,
+              margin: EdgeInsets.only(left: 100.0, right: 100.0, bottom: 20.0),
+              padding: EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.50),
+                  borderRadius: BorderRadius.circular(10.0)),
+              child: cat,
+            ),
+
             Text(
               'You have pushed the button this many times:',
             ),
@@ -118,6 +134,147 @@ class SubmitButton extends StatelessWidget {
       onPressed: () {
         print("presse");
       },
+    );
+  }
+}
+
+class FirstPage extends StatelessWidget {
+  const FirstPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('First Page'),
+        actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.arrow_forward)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.architecture)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.bus_alert)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.medication)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.food_bank)),
+        ],
+      ),
+    );
+  }
+}
+
+class SecoundPage extends StatelessWidget {
+  const SecoundPage({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Secound Page'),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.build_circle_sharp),
+        onPressed: () {},
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("ssss"),
+            Table(
+              children: [
+                TableRow(children: [
+                  Container(
+                      child: Center(child: Text("No")),
+                      decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10.0))),
+                  Container(
+                      child: Center(child: Text("Name")),
+                      decoration: BoxDecoration(
+                          color: Colors.green,
+                          borderRadius: BorderRadius.circular(10.0))),
+
+                  ///Text("Name"),
+                ]),
+                TableRow(children: [
+                  Text("1"),
+                  Text("A"),
+                ]),
+                TableRow(children: [
+                  Text("2"),
+                  Text("B"),
+                ])
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ThridPage extends StatelessWidget {
+  const ThridPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 3,
+      initialIndex: 1,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("ThridPage"),
+          bottom: TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.cloud)),
+              Tab(icon: Icon(Icons.beach_access)),
+              Tab(icon: Icon(Icons.brightness_1_outlined))
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            Center(
+              child: Text('Cloud'),
+            ),
+            Center(
+              child: Text('Umbrella'),
+            ),
+            Center(
+              child: Text('Sunny'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class FourthPage extends StatelessWidget {
+  const FourthPage({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> enties = <String>['A','B','C','D','E','F','G','H','I','J','K','L'];
+    final List<int> colorCodes = <int>[600,500,100];
+    return Scaffold(
+appBar: AppBar(
+  title: Text("Listview Example"),
+
+
+),
+body: ListView.separated(
+  padding: EdgeInsets.all(8.0),
+  itemCount: enties.length,
+  itemBuilder: (context, index) {
+    return Container(
+      height: 100,
+      color: Colors.amber[colorCodes[index % 3]],
+      child: Center(
+       child: Text('Entry ${enties[index]}'),),);
+    
+  }, 
+  separatorBuilder: (context, index) => Divider(), 
+    
+  ), 
+  
+    
+      
     );
   }
 }
