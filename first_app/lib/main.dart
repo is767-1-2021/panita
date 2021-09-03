@@ -13,13 +13,16 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
             accentColor: Colors.red,
             textTheme: TextTheme(bodyText2: TextStyle(color: Colors.purple))),
+
         //home: MyHomePage(title: 'Pop Cat'),
-        initialRoute: '/fourth',
+        initialRoute: '/5',
         routes: <String, WidgetBuilder>{
-          '/first': (context) => FirstPage(),
-          '/secound': (context) => SecoundPage(),
-          '/thrid': (context) => ThridPage(),
-          '/fourth': (context) => FourthPage()
+          '/1': (context) => FirstPage(),
+          '/2': (context) => SecoundPage(),
+          '/3': (context) => ThridPage(),
+          '/4': (context) => FourthPage(),
+          '/5': (context) => fifthPage(),
+          '/6': (context) => SixthPage()
         });
   }
 }
@@ -276,5 +279,120 @@ body: ListView.separated(
     
       
     );
+  }
+}
+class fifthPage extends StatelessWidget {
+  const fifthPage({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Grid View"),),
+      body: GridView.count(
+        crossAxisCount: 2,
+        children: List.generate(6, (index){
+          return InkWell(
+            onTap: (){
+              // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              //   content:Text('Tap at $index'),
+              // ));
+              Navigator.pushNamed(context, '/${index+1}');
+              },
+              child: Container(
+                margin: EdgeInsets.all(20.0),
+            
+            decoration: BoxDecoration(
+          color: Colors.amber,
+          borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: Center(
+            child: Text('Item ${index+1}',
+            style: Theme.of(context).textTheme.headline5,
+            )
+            )));
+        }),
+    )
+    );
+  }
+}
+class SixthPage extends StatelessWidget {
+  const SixthPage({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('First Form'),
+      ),
+    body: MyCustomForm(),
+    );
+    
+  }
+}
+class MyCustomForm extends StatefulWidget {
+  
+
+  @override
+  _MyCustomFormState createState() => _MyCustomFormState();
+}
+
+class _MyCustomFormState extends State<MyCustomForm> {
+  final _formKey = GlobalKey<FormState>();
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            decoration: InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your firstname'
+            ),
+            validator: (value){
+              if (value == null || value.isEmpty){
+                return 'Please enter something';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your lastname'
+            ),
+            validator: (value){
+              if (value == null || value.isEmpty){
+                return 'Please enter something';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Enter your age'
+            ),
+            validator: (value){
+              if (value == null || value.isEmpty){
+                return 'Please enter something';
+              }
+              if(int.parse(value)<18){
+                 return 'Please enter valid age';
+              }
+              return null;})
+            ,
+          
+          ElevatedButton(
+            onPressed: (){
+              if(_formKey.currentState!.validate())
+           {
+             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Hoorayyyy')));
+           } }, 
+            child: Text('Validate'))
+        ],
+      ),
+    );
+      
+    
   }
 }
