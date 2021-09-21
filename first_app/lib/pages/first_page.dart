@@ -1,5 +1,7 @@
+import 'package:first_app/models/first_form_model.dart';
 import 'package:first_app/pages/secound_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class FirstPage extends StatefulWidget {
   const FirstPage({Key? key}) : super(key: key);
@@ -33,27 +35,26 @@ class _FirstPageState extends State<FirstPage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.food_bank)),
         ],
       ),
-      body: Center(
+       body: Center(
         child: Column(
           children: [
-            Padding(padding: EdgeInsets.all(20.0),
-            child: Text('$_formData')),
+            Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Consumer<FirstFormModel>(
+                builder: (context, form, child) {
+                  return Text('${form.firstName} ${form.lastName} ${form.age}');
+                },
+              ),
+            ),
             ElevatedButton(
-              onPressed: () async{
-              var response =  await Navigator.pushNamed(context, '/6');
-              if(response != null && !response.toString().isEmpty)
-              {
-               
-                setState(() { //เพื่อให้ค่า reset
-                   _formData = response.toString();
-                });
-              }
-              //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response.toString()),));
-             
-            },
-            child: Text('Fill this form please')),
+              onPressed: () {
+                Navigator.pushNamed(context, '/6');
+              },
+              child: Text('Fill this form please'),
+            ),
           ],
-        )),
+        ),
+      ),
     );
   }
 }
