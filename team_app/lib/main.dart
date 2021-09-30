@@ -1,5 +1,7 @@
+import 'package:first_app/model/patient_form_model.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'pages/fifth_page.dart';
 import 'pages/first_page.dart';
@@ -12,7 +14,16 @@ import 'pages/thrid_page.dart';
 import 'pages/seventh_page.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => patientFormModel(),
+      ),
+     
+      
+    ],
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -45,7 +56,6 @@ class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
-
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -155,7 +165,3 @@ class SubmitButton extends StatelessWidget {
     );
   }
 }
-
-
-
-

@@ -29,6 +29,7 @@ class _MyCustomFormState extends State<MyCustomForm> {
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
+       child: SingleChildScrollView(
       child: Column(
         children: [
           TextFormField(
@@ -94,6 +95,6 @@ class _MyCustomFormState extends State<MyCustomForm> {
               child: Text('Validate'))
         ],
       ),
-    );
+    ));
   }
 }

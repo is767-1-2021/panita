@@ -45,6 +45,7 @@ class _FirstPageState extends State<FirstPage> {
               {
                
                 setState(() { //เพื่อให้ค่า reset
+                
                    _formData = response.toString();
                 });
               }
