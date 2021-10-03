@@ -1,7 +1,12 @@
+import 'package:first_app/constants/color_constant.dart';
 import 'package:first_app/model/patient_form_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'patient_list_page.dart';
+import 'patient_to_hospitelpage.dart';
+import 'qr_scan_page.dart';
 
 class Result_Page extends StatefulWidget {
   const Result_Page({Key? key}) : super(key: key);
@@ -17,8 +22,15 @@ class _Result_PageState extends State<Result_Page> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('บันทึกผลการตรวจ'),
-      ),
+        title: Text('บันทึกผลการตรวจ',style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: iWhiteColor
+          ),
+        ),
+        backgroundColor: iBlueColor
+        ),
+      
       body: Card(
         child: Form(
           key: formKey,
@@ -33,13 +45,14 @@ class _Result_PageState extends State<Result_Page> {
                 // builder: (context, form, child) {
                 //   return Text('${form.firstName} ${form.lastName} ${form.age}');
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Column(
                         children: <Widget>[
                           Text(
-                            "ชื่อ-นามสกุล :",
-                            style: TextStyle(fontSize: 20),
+                            "ชื่อ-นามสกุล : ",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.black)
                           ),
                         ],
                       ),
@@ -51,7 +64,7 @@ class _Result_PageState extends State<Result_Page> {
                                 return Text(
                                   '${form.firstName} ${form.lastName} ',
                                   style: TextStyle(
-                                      fontSize: 20, color: Colors.black),
+                                      fontSize: 18, color: Colors.black),
                                 );
                               },
                             ),
@@ -64,13 +77,15 @@ class _Result_PageState extends State<Result_Page> {
                   child: Padding(
                 padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Column(
                         children: <Widget>[
                           Text(
-                            "เบอร์โทรศัพท์ :",
-                            style: TextStyle(fontSize: 20),
+                            "เบอร์โทรศัพท์ : ",
+                            
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.black)
                           ),
                         ],
                       ),
@@ -83,7 +98,7 @@ class _Result_PageState extends State<Result_Page> {
                                 return Text(
                                   '${form.phone} ',
                                   style: TextStyle(
-                                      fontSize: 20, color: Colors.black),
+                                      fontSize: 18, color: Colors.black),
                                 );
                               },
                             ),
@@ -97,13 +112,15 @@ class _Result_PageState extends State<Result_Page> {
                   child: Padding(
                 padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Column(
                         children: <Widget>[
                           Text(
-                            "โรงพยาบาลที่เข้ารับการตรวจ :",
-                            style: TextStyle(fontSize: 20),
+                            "โรงพยาบาลที่เข้ารับการตรวจ : ",
+                            
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.black)
                           ),
                         ],
                       ),
@@ -118,7 +135,7 @@ class _Result_PageState extends State<Result_Page> {
                                 return Text(
                                   '${form.hospital}',
                                   style: TextStyle(
-                                      fontSize: 20, color: Colors.black),
+                                      fontSize: 18, color: Colors.black),
                                 );
                               },
                             ),
@@ -131,13 +148,14 @@ class _Result_PageState extends State<Result_Page> {
                   child: Padding(
                 padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
                 child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Column(
                         children: <Widget>[
                           Text(
-                            "วันที่เข้ารับการตรวจ :",
-                            style: TextStyle(fontSize: 20),
+                            "วันที่เข้ารับการตรวจ : ",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.black)
                           ),
                         ],
                       ),
@@ -153,7 +171,7 @@ class _Result_PageState extends State<Result_Page> {
                                 return Text(
                                   '${dateappointment}',
                                   style: TextStyle(
-                                      fontSize: 15, color: Colors.black),
+                                      fontSize: 18, color: Colors.black),
                                 );
                               },
                             ),
@@ -169,22 +187,19 @@ class _Result_PageState extends State<Result_Page> {
                     ElevatedButton(
                       child: Text("ติดเชื้อ"),
                       onPressed: () {
-                        // Navigator.pushReplacement(context,
-                        //     MaterialPageRoute(builder: (context) {
-                        //   return approve();
-                        // })
-                        // );
-                      },
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return PatienttoHospitel();
+                        })
+                        );
+                       }
+                      ,
                     ),
                     SizedBox(width: 20, height: 50),
                     ElevatedButton(
                       child: Text("ไม่ติดเชื้อ"),
                       onPressed: () {
-                        // Navigator.pushReplacement(context,
-                        //     MaterialPageRoute(builder: (context) {
-                        //   return approve();
-                        // })
-                        // );
+                        Navigator.pop(context);
                       },
                     )
                   ],

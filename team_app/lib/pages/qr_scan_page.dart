@@ -1,3 +1,4 @@
+import 'package:first_app/constants/color_constant.dart';
 import 'package:first_app/model/patient_form_model.dart';
 import 'package:first_app/pages/result_page.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +31,23 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
     if (d != null) {
       setState(() {
         startdate = DateFormat('dd-MM-yyyy').format(d);
-
         _dateappointment = d;
+      });
+    }
+  }
+
+  DateTime date = DateTime.now();
+  TimeOfDay time = TimeOfDay.now();
+  Future<Null> selectDatePicker(BuildContext context) async {
+    final DateTime? datePicked = await showDatePicker(
+        context: context,
+        initialDate: date,
+        firstDate: DateTime(1940),
+        lastDate: DateTime(2030));
+    if (datePicked != null && datePicked != date) {
+      setState(() {
+        date = datePicked;
+        _dateappointment = date;
       });
     }
   }
@@ -51,16 +67,55 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
     int? _phone;
     String? _hospital;
 
+    var str = "date: '2019:04:01'";
+    var parts = qrString.split(' ');
+    // var idcard = parts[0].trim(); // prefix: "date"
+    // var qrfirstname = parts[1].trim();
+    // var qrlastname = parts[2].trim();
+    // var qrphone = parts[3].trim();
+    // var qrhospital = parts[4].trim();
+    // var qrdateappointment = parts[5].trim();
+    //var date = parts.sublist(0).join('').trim();
+
     return Scaffold(
         appBar: AppBar(
-          title: Text('บันทึกการจองคิว'),
+          title: Text('บันทึกการจองคิว',style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: iWhiteColor
+          ),
+        ),
+        backgroundColor: iBlueColor
         ),
         body: Form(
           key: _formKey,
           child: SingleChildScrollView(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
+            children: [Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "วันที่จองคิว",
+                    style: TextStyle(fontSize: 15, color: Colors.black),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      '${date.day}/${date.month}/${date.year}',
+                      textAlign: TextAlign.center,  style: TextStyle(fontSize: 15, color: Colors.black),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.calendar_today),
+
+                    onPressed: () {
+                      selectDatePicker(context);
+                    },
+                    //color: iBlueColor,
+                  ),
+                ],
+              ),
               TextFormField(
                 decoration: InputDecoration(
                   border: UnderlineInputBorder(),
@@ -77,6 +132,8 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
                   _firstName = value;
                 },
                 initialValue: context.read<patientFormModel>().firstName,
+
+                //initialValue: prefix,
               ),
               TextFormField(
                 decoration: InputDecoration(
@@ -100,6 +157,7 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
                     border: UnderlineInputBorder(),
                     labelText: 'Enter your phone',
                     icon: Icon(Icons.ring_volume)),
+                initialValue: context.read<patientFormModel>().phone.toString(),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter something';
@@ -119,6 +177,7 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
                   labelText: 'Enter Hospital Name',
                   icon: Icon(Icons.business),
                 ),
+                initialValue: context.read<patientFormModel>().hospital,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter something';
@@ -129,49 +188,52 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
                   _hospital = value;
                 },
               ),
-              Row(
-                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Text(
-                          "วันที่ :",
-                          style: TextStyle(fontSize: 15, color: Colors.black),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      width: 20,
-                      height: 50,
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Row(children: <Widget>[
-                          Text(
-                            startdate,
-                            style: TextStyle(fontSize: 15, color: Colors.black),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.calendar_today),
-                            onPressed: () {
-                              _openDatepickerstart(context);
+              //Row(
+              // // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // children: <Widget>[
+              //   Column(
+              //     children: <Widget>[
+              //       Text(
+              //         "วันที่ :",
+              //         style: TextStyle(fontSize: 15, color: Colors.black),
 
-                              // print(context);
-                              // then((date){
+              //       ),
+              //     ],
+              //   ),
+              //   SizedBox(
+              //     width: 20,
+              //     height: 50,
+              //   ),
+              //   Column(
+              //     mainAxisAlignment: MainAxisAlignment.start,
+              //     children: <Widget>[
+              //       Row(children: <Widget>[
 
-                              //   setState(() {
-                              //     myleave.startdate = DateTime.parse(date);
-                              //   });
+              //         Text(
+              //           startdate,
+              //           style: TextStyle(fontSize: 15, color: Colors.black),
+              //         ),
+              //         IconButton(
+              //           icon: Icon(Icons.calendar_today),
+              //           onPressed: () {
+              //             _openDatepickerstart(context);
 
-                              // }
-                              // );
-                            },
-                          ),
-                        ])
-                      ],
-                    ),
-                  ]),
+              //             // print(context);
+              //             // then((date){
+
+              //             //   setState(() {
+              //             //     myleave.startdate = DateTime.parse(date);
+              //             //   });
+
+              //             // }
+              //             // );
+              //           },
+              //         ),
+              //       ])
+              //     ],
+              //   ),
+              // ]),
+              
               // Row(
               //     // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               //     children: <Widget>[
@@ -245,7 +307,8 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
                         context.read<patientFormModel>().dateappointment =
                             _dateappointment;
                         // print(_dateappointment);
-                        print(_time);
+                        // print(_time);
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -258,7 +321,8 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
               SizedBox(
                 width: 20,
                 height: 100,
-              ),Text(qrString),
+              ),
+              Text(qrString),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -276,30 +340,30 @@ class _ScanQR_PageState extends State<ScanQR_Page> {
 
   Future<void> scanQR() async {
     try {
-      FlutterBarcodeScanner.scanBarcode("#2A99CF", "Cancle", true, ScanMode.QR).then((value){
+      FlutterBarcodeScanner.scanBarcode("#2A99CF", "Cancle", true, ScanMode.QR)
+          .then((value) {
         setState(() {
           qrString = value;
+          //qrString = "panita tharaphom";
+        });
       });
-      });}
-
-
-     catch (e) {
+    } catch (e) {
       setState(() {});
     }
   }
 
-  _showTimePicker(BuildContext context) async {
-    TimeOfDay? time =
-        await showTimePicker(context: context, initialTime: _time);
+  // _showTimePicker(BuildContext context) async {
+  //   TimeOfDay? time =
+  //       await showTimePicker(context: context, initialTime: _time);
 
-    if (time != null)
-      setState(() {
-        _time = time;
-      });
-    else {
-      setState(() {
-        _time = TimeOfDay.now();
-      });
-    }
-  }
+  //   if (time != null)
+  //     setState(() {
+  //       _time = time;
+  //     });
+  //   else {
+  //     setState(() {
+  //       _time = TimeOfDay.now();
+  //     });
+  //   }
+  // }
 }

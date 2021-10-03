@@ -23,13 +23,13 @@ class _FirstPageState extends State<FirstPage> {
           IconButton(onPressed: () {
             Navigator.push(context,
             MaterialPageRoute(
-              builder: (context) => SecoundPage(),
+              builder: (context) => SecoundPage(), // ใช้แบบ on the fly
             ),
             );
             },
           icon: Icon(Icons.bus_alert)),
           IconButton(onPressed: () {
-             Navigator.pushNamed(context, '/3');
+             Navigator.pushNamed(context, '/3'); // ใช้แบบนี้ก้อได้
            
           }, icon: Icon(Icons.medication)),
           IconButton(onPressed: () {}, icon: Icon(Icons.food_bank)),

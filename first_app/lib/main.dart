@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
             accentColor: Colors.red,
             textTheme: TextTheme(bodyText2: TextStyle(color: Colors.purple))),
+            // Rount ข้างล่างก็จะ set theme ต่างๆตามเที่เรากำหนดไว้
 
         //home: MyHomePage(title: 'Pop Cat'),
         initialRoute: '/5',
