@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class fifthPage extends StatelessWidget {
   final List<String> name = <String>[
-    'บันทึกการตรวจ Covid',
+    'บันทึกการจองคิวตรวจ Covid',
     'บันทึกการส่งตัวไป Hospitel',
     'Menu A',
     'Menu B',
