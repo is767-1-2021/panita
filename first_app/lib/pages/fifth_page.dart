@@ -10,7 +10,7 @@ class fifthPage extends StatelessWidget {
       appBar: AppBar(title: Text("Grid View"),),
       body: GridView.count(
         crossAxisCount: 2,
-        children: List.generate(7, (index){
+        children: List.generate(8, (index){
           return InkWell(
             onTap: (){
               // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
