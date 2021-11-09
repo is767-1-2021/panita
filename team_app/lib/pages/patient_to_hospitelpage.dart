@@ -1,6 +1,7 @@
-import 'package:first_app/constants/color_constant.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:icovid/constants/color_constant.dart';
 
 import 'qr_scan_page.dart';
 

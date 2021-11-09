@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.first_app">
+    package="com.example.team_app">
    <application
-        android:label="first_app"
-        android:icon="@mipmap/launcher_icon">
+        android:label="team_app"
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

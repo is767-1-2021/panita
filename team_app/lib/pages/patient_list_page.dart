@@ -1,9 +1,13 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:team_app/pages/hospitel_detail_page.dart';
-// import 'package:team_app/pages/hostpitel_info_page.dart';
-// import 'package:table_calendar/table_calendar.dart';
-// import 'package:team_app/pages/patient_status_page.dart';
+import 'package:icovid/constants/color_constant.dart';
+import 'package:icovid/models/patient_class_hospitel.dart';
+import 'package:icovid/models/patient_form_model_hospitel.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import 'login_page.dart';
 
 class PatientListPage extends StatefulWidget {
   @override
@@ -11,57 +15,41 @@ class PatientListPage extends StatefulWidget {
 }
 
 class _PatientListPageState extends State<PatientListPage> {
+    List<PatientHospitel> _patientList = [];
+    
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF26A69A),
-        title: Text('Patient Today'),
+        backgroundColor: iBlueColor,
+        title: Text('รายชื่อผู้เข้ารับการรักษา Hospitel'),
         // centerTitle: true,
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              onPressed: () {
-                showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1990),
-                    lastDate: DateTime(2050));
-              },
-              icon: Icon(Icons.calendar_today)),
-          IconButton(
-              onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => HospitelDetailPage(),
-                //   ),
-                // );
-              },
-              icon: Icon(Icons.shopping_cart_rounded)),
-          IconButton(
-              onPressed: () {
-                /* Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ...(),
-                  ),
-                );*/
-              },
-              icon: Icon(Icons.settings_power)),
+            icon: Icon(Icons.logout),
+            iconSize: 28.0,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LogInScreen())
+              );
+            },
+          ),
         ],
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-            colors: [Colors.teal.shade600, Colors.amberAccent],
-            begin: Alignment.bottomLeft,
-            end: Alignment.bottomRight,
-          )),
-        ),
+        // flexibleSpace: Container(
+        //   decoration: BoxDecoration(
+        //       gradient: LinearGradient(
+        //     colors: [Colors.teal.shade600, Colors.amberAccent],
+        //     begin: Alignment.bottomLeft,
+        //     end: Alignment.bottomRight,
+        //   )),
+        // ),
       ),
       body: PatientSearch(),
     );
   }
 }
+
 
 class PatientSearch extends StatefulWidget {
   @override
@@ -69,126 +57,349 @@ class PatientSearch extends StatefulWidget {
 }
 
 class _PatientSearchState extends State<PatientSearch> {
-  final List<Map<String, dynamic>> _allPatient = [
-    {"id": 1, "name": "Ganokporn", "age": 28},
-    {"id": 2, "name": "Lalisa", "age": 43},
-    {"id": 3, "name": "Kornkamon", "age": 25},
-    {"id": 4, "name": "Kitti", "age": 35},
-    {"id": 5, "name": "Chayanee", "age": 21},
-    {"id": 6, "name": "Natthakarn", "age": 58},
-    {"id": 7, "name": "Thanaphat", "age": 30},
-    {"id": 8, "name": "Punnarat", "age": 54},
-    {"id": 9, "name": "Ploypailin", "age": 18},
-    {"id": 10, "name": "Kamonned", "age": 32},
-    {"id": 11, "name": "Anakin", "age": 15},
-    {"id": 12, "name": "Thiti", "age": 23},
-    {"id": 13, "name": "Naphat", "age": 37},
-    {"id": 14, "name": "Puttipong", "age": 46},
-    {"id": 15, "name": "Wongsakorn", "age": 29},
-    {"id": 16, "name": "Chotika", "age": 22},
-    {"id": 17, "name": "Jirayu", "age": 19},
-    {"id": 18, "name": "Pakorn", "age": 40},
-    {"id": 19, "name": "Rinlada", "age": 68},
-    {"id": 20, "name": "Patcharin", "age": 21},
-  ];
 
-  List<Map<String, dynamic>> _foundPatient = [];
+  // getItemAndNavigate(String item, BuildContext context) {
+  //   Navigator.push(context,
+  //       MaterialPageRoute(builder: (context) => StatusForm(itemHolder: item)));
+  // }
 
+  // List<Map<String, dynamic>> _foundPatient = [];
+
+  // @override
+  // initState() {
+  //   _foundPatient = _allPatient;
+  //   super.initState();
+  // }
+
+  // void _runFilter(String enteredKeyword) {
+  //   List<Map<String, dynamic>> results = [];
+
+  //   if (enteredKeyword.isEmpty) {
+  //     results = _allPatient;
+  //   } else {
+  //     results = _allPatient
+  //         .where((user) =>
+  //             user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+  //         .toList();
+  //   }
+
+  //   setState(() {
+  //     _foundPatient = results;
+  //   });
+  // }
+
+ 
   @override
-  initState() {
-    _foundPatient = _allPatient;
-    super.initState();
-  }
-
-  void _runFilter(String enteredKeyword) {
-    List<Map<String, dynamic>> results = [];
-    if (enteredKeyword.isEmpty) {
-      results = _allPatient;
-    } else {
-      results = _allPatient
-          .where((user) =>
-              user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-          .toList();
+  Widget build(BuildContext context) {
+    List<PatientHospitel> _patientList = [];
+    if (context.read<PatientFormModelHospitel>().patientList != null) {
+      _patientList = context.read<PatientFormModelHospitel>().patientList;
     }
+    return Scaffold(
+      // body: Center(
+      //   child: Padding(
+      //     padding: const EdgeInsets.all(10),
+      //     child: Column(
+      //       children: [
+      //         SizedBox(
+      //           height: 20,
+      //         ),
+      //         TextField(
+      //           onChanged: (value) => _runFilter(value),
+      //           decoration: InputDecoration(
+      //               hintText: "Enter patient name",
+      //               hintStyle: TextStyle(color: Colors.amber),
+      //               labelText: 'Search Patient',
+      //               floatingLabelBehavior: FloatingLabelBehavior.always,
+      //               border: OutlineInputBorder(
+      //                 borderRadius: BorderRadius.circular(20),
+      //               ),
+      //               suffixIcon: Icon(Icons.search)),
+      //         ),
 
-    setState(() {
-      _foundPatient = results;
-    });
+               body: 
+               ListView.builder(
+        itemCount: _patientList.length,
+        itemBuilder: (context, int index) {
+          //User data = provider.users[index];
+          return Dismissible(
+            key: ValueKey(_patientList[index]),
+            onDismissed: (direction) {
+              // Remove the item from the data source.
+              setState(() {
+                //UserProvider().RemoveUserList(_userList[index]);
+                _patientList.removeAt(index);
+              });
+
+              // Then show a snackbar.
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('${_patientList[index].lastName} ถูกลบ')));
+            },
+            // Show a red background as the item is swiped away.
+            background: Container(color: Colors.red),
+            child: Card(
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  child: FittedBox(
+                    child: Icon(Icons.person),
+                  ),
+                ),
+                title: Text('${_patientList[index].firstName}'' ''${_patientList[index].lastName}'),
+                subtitle: Text('${_patientList[index].dateappointment}'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PatientDetail(Patients: _patientList[index]),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
+}
 
+class PatientDetail extends StatelessWidget {
+  final PatientHospitel Patients;
+  const PatientDetail({Key? key, required this.Patients}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              TextField(
-                onChanged: (value) => _runFilter(value),
-                decoration: InputDecoration(
-                    hintText: "Enter patient name",
-                    hintStyle: TextStyle(color: Colors.amber),
-                    labelText: 'Search Patient',
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    suffixIcon: Icon(Icons.search)),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Expanded(
-                child: _foundPatient.length > 0
-                    ? ListView.builder(
-                        itemCount: _foundPatient.length,
-                        itemBuilder: (context, index) => Card(
-                          key: ValueKey(_foundPatient[index]["id"]),
-                          color: Colors.greenAccent.shade100,
-                          elevation: 4,
-                          margin: EdgeInsets.symmetric(vertical: 10),
-                          child: ListTile(
-                            leading: Text(
-                              _foundPatient[index]["id"].toString(),
-                              style: TextStyle(
-                                  fontSize: 27, color: Colors.teal.shade600),
-                            ),
-                            title: Text(
-                              _foundPatient[index]['name'],
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.teal.shade600,
-                              ),
-                            ),
-                            subtitle: Text(
-                              '${_foundPatient[index]["age"].toString()} years old',
-                              style:
-                                  TextStyle(fontSize: 15, color: Colors.grey),
-                            ),
-                            onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                                  //builder: (context) => StatusForm(),
-                              //   ),
-                              // );
-                            },
-                          ),
-                        ),
-                      )
-                    : Text(
-                        'No results found',
-                        style: TextStyle(fontSize: 24),
-                      ),
-              ),
-            ],
+      appBar: AppBar(
+        title: Text('รายละเอียดผู้เข้ารับการรักษา'),
+        backgroundColor: iBlueColor,
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => LogInScreen()),
+              // );
+            },
+            icon: Icon(Icons.logout),
           ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                enabled: false,
+                labelText: 'ชื่อ-นามสกุล',
+                labelStyle: TextStyle(
+                    color: iBlackColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+              ),
+              initialValue: '${Patients.firstName}'  '${Patients.lastName}',
+            ),
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                enabled: false,
+                labelText: 'วันที่เข้ารับการตรวจเชื้อ',
+                labelStyle: TextStyle(
+                    color: iBlackColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+              ),
+              initialValue: '${Patients.dateappointment}',
+            ),
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                enabled: false,
+                labelText: 'เบอร์โทรศัพท์ผู้ป่วย',
+                labelStyle: TextStyle(
+                    color: iBlackColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+              ),
+              initialValue: '${Patients.phone}',
+            ),
+            // TextFormField(
+            //   decoration: InputDecoration(
+            //     border: UnderlineInputBorder(),
+            //     enabled: false,
+            //     labelText: 'รหัสผ่าน',
+            //     labelStyle: TextStyle(
+            //         color: iBlackColor,
+            //         fontWeight: FontWeight.w700,
+            //         fontSize: 16),
+            //     enabledBorder: UnderlineInputBorder(
+            //       borderSide: BorderSide(color: iBlueColor),
+            //     ),
+            //     focusedBorder: UnderlineInputBorder(
+            //       borderSide: BorderSide(color: iBlueColor),
+            //     ),
+            //   ),
+            //   initialValue: '${user.password}',
+            // ),
+            Divider(),
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                enabled: false,
+                labelText: 'วันที่เข้ารับการรักษา',
+                labelStyle: TextStyle(
+                    color: iBlackColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+              ),
+              initialValue: '${Patients.dateappointment}',
+            ), 
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                enabled: false,
+                labelText: 'วันที่ออกการรักษา',
+                labelStyle: TextStyle(
+                    color: iBlackColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+              ),
+              initialValue: DateFormat('dd/MM/yyyy').format(DateTime.now()).toString()
+            ),ElevatedButton(
+                            
+                            onPressed: () {
+                              // if (formKey.currentState!.validate()) {
+                              //   formKey.currentState!.save();
+
+                              //   List<Patient> Listpatient = [];
+                              //   print('${form.firstName}');
+                              //   print('${form.lastName}');
+                              //   print('${form.phone}');
+
+                              //   if (context
+                              //           .read<PatientFormModel>()
+                              //           .patientList !=
+                              //       null) {
+                              //     print('||||');
+                              //     Listpatient = context
+                              //         .read<PatientFormModel>()
+                              //         .patientList;
+                              //   }
+                              //   Listpatient.add(Patient(
+                              //       idCard: 11,
+                              //       firstName: '${form.firstName}',
+                              //       lastName: '${form.lastName}',
+                              //       phone: '${form.phone}',
+                              //       dateappointment:
+                              //           '${form.dateappointment}'));
+
+                              //   context.read<PatientFormModel>().patientList =
+                              //       Listpatient;
+                              //   // _showDialog(context);
+                              
+                             Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PatientListPage()));
+                        }, style: ElevatedButton.styleFrom(
+                        primary: iBlueColor,
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      child: Text('บันทึก',
+                          style: TextStyle(fontSize: 20, color: iWhiteColor)),
+                    )
+          ],
         ),
       ),
     );
   }
 }
+
+              // SizedBox(
+              //   height: 20,
+              // ),
+              // Expanded(
+              //   child: _foundPatient.length > 0
+              //       ? ListView.builder(
+              //           itemCount: _foundPatient.length,
+              //           itemBuilder: (context, index) => Card(
+              //             key: ValueKey(_foundPatient[index]["id"]),
+              //             color: Colors.greenAccent.shade100,
+              //             elevation: 4,
+              //             margin: EdgeInsets.symmetric(vertical: 10),
+              //             child: ListTile(
+              //               leading: Text(
+              //                 _foundPatient[index]["id"].toString(),
+              //                 style: TextStyle(
+              //                     fontSize: 27, color: Colors.teal.shade600),
+              //               ),
+              //               title: Text(
+              //                 _foundPatient[index]['name'],
+              //                 style: TextStyle(
+              //                   fontSize: 20,
+              //                   color: Colors.teal.shade600,
+              //                 ),
+              //               ),
+              //               subtitle: Text(
+              //                 '${_foundPatient[index]["age"].toString()} years old',
+              //                 style:
+              //                     TextStyle(fontSize: 15, color: Colors.grey),
+              //               ),
+              //               onTap: () => {
+              //                 getItemAndNavigate(
+              //                     //_foundPatient.toString(), context)
+              //                     _foundPatient[index]['name'],
+              //                     context)
+              //               },
+
+              //               /* onTap: () {
+              //                 Navigator.push(
+              //                   context,
+              //                   MaterialPageRoute(
+              //                     builder: (context) => StatusForm(),
+              //                   ),
+              //                 );
+              //               },*/
+              //             ),
+              //           ),
+              //         )
+              //       : Text(
+              //           'No results found',
+              //           style: TextStyle(fontSize: 24),
+              //         ),
+              // ),
+           
