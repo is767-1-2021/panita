@@ -1,64 +1,112 @@
 import 'package:flutter/material.dart';
 import 'package:icovid/constants/color_constant.dart';
-import 'package:icovid/controller/booking.dart';
-import 'package:icovid/models/booking_class.dart';
-import 'package:icovid/models/booking_list_model.dart';
+import 'package:icovid/controller/booking_controller.dart';
+import 'package:icovid/models/booking_provider_model.dart';
+import 'package:icovid/models/booking_class_model.dart';
 import 'package:icovid/pages/login_page.dart';
+import 'package:icovid/services/booking_service.dart';
 import 'package:provider/provider.dart';
 
 class BookingListcreen extends StatefulWidget {
-  final BookingController controller;
-
-  BookingListcreen({required this.controller});
+  var service = FirebaseServices();
+  var controller;
+  BookingListcreen() {
+    controller = BookingController(service);
+  }
 
   @override
   _BookingListcreenState createState() => _BookingListcreenState();
 }
 
 class _BookingListcreenState extends State<BookingListcreen> {
-  List<Booking> bookings = List.empty();
+  List<Booking> _bookingList = [];
   bool isLoading = false;
+  String id_card_test = "1111111111111";
 
   @override
   void initState() {
     super.initState();
-    setState(() {});
-    widget.controller.onSync
-        .listen((bool syncState) => setState(() => isLoading = syncState));
-    _getBookings();
+    widget.controller.onSync.listen((bool syncState) => setState(() => isLoading = syncState));
   }
 
-  void _getBookings() async {
-    var bookingList = await widget.controller.fecthBookings();
+  void _getBookings(BuildContext context) async {
+    var bookingList = await widget.controller.fecthBookings(id_card_test);
     setState(() {
-      bookings = bookingList;
+        context.read<BookingProvider>().bookingList = bookingList;
+    });
+  }
+
+  void _cancelQueue(String idCardNumber, int bookingNumber, int hopitalNumber,BuildContext context) async {
+    await widget.controller.cancelQueue(idCardNumber, bookingNumber, hopitalNumber);
+    var bookingList = await widget.controller.fecthBookings(id_card_test);
+    setState(() {
+      context.read<BookingProvider>().bookingList = bookingList;
     });
   }
 
   Widget get body => isLoading
       ? CircularProgressIndicator()
       : ListView.builder(
-          itemCount: bookings.isEmpty ? 1 : bookings.length,
+          itemCount: _bookingList.isEmpty ? 1 : _bookingList.length,
           itemBuilder: (context, index) {
-            if (bookings.isEmpty) {
-              return Text('ไม่พบรายการจอง');
+            if (_bookingList.isEmpty) {
+              return Center(
+                  child: Container(
+                      margin: EdgeInsets.only(top: 300),
+                      child: Text('ไม่พบรายการจอง')));
             }
             return Card(
               child: ListTile(
+                onLongPress: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('แจ้งเตือน'),
+                          content: Text(
+                              'ยืนยันการยกเลิกคิวที่ ${_bookingList[index].bookingNumber}'),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text('ยกเลิก')),
+                            TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _cancelQueue(
+                                        _bookingList[index].idCardNumber,
+                                        _bookingList[index].bookingNumber,
+                                        _bookingList[index].hospitalNumber,
+                                        context);
+                                    Navigator.pop(context);
+                                  });
+                                },
+                                child: Text('ยืนยัน')),
+                          ],
+                        );
+                      });
+                  // ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  // content: Text(' ถูกลบ')));
+                },
                 leading: CircleAvatar(
                   radius: 30,
                   child: FittedBox(
-                    child: Icon(Icons.book_online),
+                    child: Text(
+                      '${_bookingList[index].bookingNumber}',
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
-                title: Text('${bookings[index].hospitalName}'),
-                subtitle: Text('${bookings[index].checkDate}'),
+                title: Text('${_bookingList[index].hospitalName}'),
+                subtitle: Text('วันที่ตรวจ ${_bookingList[index].checkDate}'),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          BookingDetail(items: bookings[index]),
+                          BookingDetail(items: _bookingList[index]),
                     ),
                   );
                 },
@@ -68,60 +116,37 @@ class _BookingListcreenState extends State<BookingListcreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<BookingItem> _bookingList = [];
-    if (context.read<BookingListModel>().bookingList != null) {
-      _bookingList = context.read<BookingListModel>().bookingList;
+    _getBookings(context);
+    if (context.read<BookingProvider>().bookingList != null) {
+      _bookingList = context.read<BookingProvider>().bookingList;
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Center(
-          child: Text(
+        appBar: AppBar(
+          title: Text(
             'รายการจองคิวของฉัน',
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w700, color: iWhiteColor),
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: iWhiteColor),
           ),
+          backgroundColor: iBlueColor,
+          elevation: 0.0,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout),
+              iconSize: 28.0,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LogInScreen()));
+              },
+            ),
+          ],
         ),
-        backgroundColor: iBlueColor,
-        elevation: 0.0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_outlined),
-          iconSize: 30.0,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            iconSize: 28.0,
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => LogInScreen()));
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: body,
-      )
-    );
+        body: Center(
+          child: body,
+        ));
   }
 }
-
-class BookingItem {
-  final String hospitalName;
-  final String checkDate;
-  final String result;
-  final String fullName;
-
-  const BookingItem(
-      {Key? key,
-      required this.hospitalName,
-      required this.checkDate,
-      required this.result,
-      required this.fullName});
-}
-
 class BookingDetail extends StatelessWidget {
   final Booking items;
   const BookingDetail({Key? key, required this.items}) : super(key: key);
@@ -150,6 +175,24 @@ class BookingDetail extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
+            TextFormField(
+              decoration: InputDecoration(
+                border: UnderlineInputBorder(),
+                enabled: false,
+                labelText: 'คิวที่',
+                labelStyle: TextStyle(
+                    color: iBlackColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: iBlueColor),
+                ),
+              ),
+              initialValue: '${items.bookingNumber}',
+            ),
             TextFormField(
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
