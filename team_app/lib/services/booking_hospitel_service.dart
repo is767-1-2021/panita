@@ -1,13 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:icovid/models/booking_model.dart';
+import 'package:icovid/models/hospital_clas.dart';
 import 'package:icovid/models/patient_form_model.dart';
 import 'package:icovid/pages/hospital_booking_list.dart';
 
 
 abstract class BookingHospitelServices {
-  Future<List<BookingHospitel>> getCheckin();
+  Future<Booking> getCheckin(String idcard);
+  Future<List<BookingHospitelList>> getCheckinList();
   Future<void> addBookingHospitel(BookingHospitelItem items);
   Future<void> updateHospitel(int _idcard, String _checkindate,String _hospitel);
-  Future<void> updateResultPatient(int _idcard, String _checkindate);
+  Future<void> updateResultPatient(int _idcard, String _checkindate,String _result);
 }
 
 class FirebaseServiceHospitel extends BookingHospitelServices {
@@ -15,16 +18,34 @@ class FirebaseServiceHospitel extends BookingHospitelServices {
 
   @override
  //Future<List<BookingHospitel>> getCheckin(String hospital) async {
-   Future<List<BookingHospitel>> getCheckin() async {
-   
-    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('icovid_booking_hospitel')
+   Future<Booking> getCheckin(String idcard) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('icovid_booking')
+    .where('idCardNumber', isEqualTo: idcard)
+        //.orderBy('bookingNumber', descending: false)
+        .get();
+print('ssss'+idcard);
+    SingleBooking bookings = SingleBooking.fromJson(snapshot);
+    return bookings.booking;
+  }
+
+@override
+ //Future<List<BookingHospitel>> getCheckin(String hospital) async {
+   Future<List<BookingHospitelList>> getCheckinList() async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('icovid_booking')
      //.where('hospital', isEqualTo: hospital)
         //.orderBy('bookingNumber', descending: false)
         .get();
 
-    AllBookingHospitel bookings = AllBookingHospitel.fromSnapshot(snapshot);
+    AllBookingHospitelList bookings = AllBookingHospitelList.fromSnapshot(snapshot);
     return bookings.bookings;
   }
+ @override
+  Future<BHospital> getCurrentQueue(int hospitalNumber) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('icovid_hospital').get();
+    SingleHospital hospital = SingleHospital.fromJson(snapshot);
+    return hospital.hospital;
+  }
+
 
   @override
   Future<void> addBookingHospitel(BookingHospitelItem items) {
@@ -62,9 +83,11 @@ class FirebaseServiceHospitel extends BookingHospitelServices {
   }
 
    @override
-  Future<void> updateResultPatient(int _idcard, String _checkindate) async {
+  Future<void> updateResultPatient(int _idcard, String _checkindate, String _result) async {
     bool isActive = true;
     CollectionReference _ref = await FirebaseFirestore.instance.collection('icovid_booking');
+    print(_idcard);
+    print('Ser'+_checkindate);
     FirebaseFirestore.instance
         .collection('icovid_booking')
         .where('idCardNumber', isEqualTo: _idcard.toString() ) 
@@ -75,7 +98,7 @@ class FirebaseServiceHospitel extends BookingHospitelServices {
         querySnapshot.docs.forEach((doc) {
           _ref
               .doc(doc.id)
-              .update({'result': "ติดเชื้อ"});
+              .update({'result': _result});
          });
     });
   }

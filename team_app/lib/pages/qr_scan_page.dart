@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:icovid/constants/color_constant.dart';
 import 'package:icovid/controller/booking_hospitel_controller.dart';
-import 'package:icovid/models/patient_class.dart';
+import 'package:icovid/models/booking_model.dart';
 import 'package:icovid/models/patient_form_model.dart';
 import 'package:icovid/models/patient_form_model_hospitel.dart';
 import 'package:icovid/services/booking_hospitel_service.dart';
@@ -11,9 +11,70 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'hospital_booking_list.dart';
 
-class ScanQR_Page extends StatelessWidget {
-  const ScanQR_Page({Key? key}) : super(key: key);
+class ScanQR_Page extends StatefulWidget {
+  var service = FirebaseServiceHospitel();
+  var controller;
+  ScanQR_Page() {
+    controller = BookingHospitelController(service);
+  }
+  
+  @override
+  _ScanQR_PageState createState() => _ScanQR_PageState();
+}
 
+class _ScanQR_PageState extends State<ScanQR_Page> {
+  Booking? checkin ;
+  bool isLoading = false;
+ String? idcard;
+String? a ;
+
+@override
+  void initState() {
+    super.initState();
+    setState(() {});
+    widget.controller.onSync
+        .listen((bool syncState) => setState(() => isLoading = syncState));
+      
+  }
+
+   void _getCheckin(a) async {
+    var checkinlist = await widget.controller.fecthCheckin(a);
+    setState(() {
+      checkin = checkinlist;
+      print('ll'+_idcardController.text);
+      _fullnameController.text = '${checkin!.fullName}';
+       _hospitalController.text = '${checkin!.hospitalName}';
+       _checkdateController.text = '${checkin!.checkDate}';
+       String a =_idcardController.text;
+          });
+  }
+double? height, width;
+  
+  final _formkey = GlobalKey<FormState>();
+  int? _idCard;
+  String? _firstName;
+  String? _lastName;
+  String? _phone;
+  String? _hospital;
+  String? _checkindate;
+
+   
+  // var qrString ="1234567891012 panita tharaphum 0825467891 โรงพยาบาลบำรุงราษฏร์ 28/9/2021 23:0:0'";
+  //   var parts = qrString.split(' ');
+  //   var idcard = parts[0].trim(); // prefix: "date"
+  //   var qrfirstname = parts[1].trim();
+  //   var qrlastname = parts[2].trim();
+  //   var qrphone = parts[3].trim();
+  //   var qrhospital = parts[4].trim();
+  //   var qrdateappointment = parts[5].trim();
+    //var date = parts.sublist(0).join('').trim();
+
+final TextEditingController _fullnameController = new TextEditingController();
+final TextEditingController _hospitalController = new TextEditingController();
+ final TextEditingController _checkdateController = new TextEditingController();
+ final TextEditingController _idcardController = new TextEditingController();
+ 
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,43 +86,7 @@ class ScanQR_Page extends StatelessWidget {
         ),
         backgroundColor: iBlueColor,
       ),
-      body: qrScan(),
-    );
-  }
-}
-
-class qrScan extends StatefulWidget {
-  const qrScan({Key? key}) : super(key: key);
-
-  @override
-  _qrScanState createState() => _qrScanState();
-}
-
-class _qrScanState extends State<qrScan> {
-  //String qrString = "Not Scanned";
-  double? height, width;
-  
-  final _formkey = GlobalKey<FormState>();
-  int? _idCard;
-  String? _firstName;
-  String? _lastName;
-  String? _phone;
-  String? _hospital;
-  String? _checkindate;
-  var qrString ="1234567891012 panita tharaphum 0825467891 โรงพยาบาลบำรุงราษฏร์ 28/9/2021 23:0:0'";
-
-  @override
-  Widget build(BuildContext context) {
-    var parts = qrString.split(' ');
-    var idcard = parts[0].trim(); // prefix: "date"
-    var qrfirstname = parts[1].trim();
-    var qrlastname = parts[2].trim();
-    var qrphone = parts[3].trim();
-    var qrhospital = parts[4].trim();
-    var qrdateappointment = parts[5].trim();
-    //var date = parts.sublist(0).join('').trim();
-
-    return Form(
+      body:   Form(
         key: _formkey,
         child: SingleChildScrollView(
           child: Padding(
@@ -70,14 +95,14 @@ class _qrScanState extends State<qrScan> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextFormField(
+                     TextFormField(
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(),
-                        labelText: 'หมายเลขบัตรประจำตัวประชาชน',
+                        labelText: 'กรอกหมายเลขบัตรประจำตัวประชาชน',
                         labelStyle: TextStyle(
                             color: iBlackColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 23),
+                            fontSize: 20),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
@@ -86,8 +111,10 @@ class _qrScanState extends State<qrScan> {
                         ),
                       ),
                       keyboardType: TextInputType.number,
+                     controller: _idcardController,
                       maxLength: 13,
                       validator: (value) {
+                        idcard = value;
                         if (value == null || value.isEmpty) {
                           return 'กรุณาระบุเลขที่บัตรประจำตัวประชาชน';
                         }
@@ -101,27 +128,73 @@ class _qrScanState extends State<qrScan> {
                       },
                       onSaved: (value) {
                         _idCard = int.parse(value!);
+                       
                       },
-                      initialValue: (context.read<PatientFormModel>().idCard ==
-                              null)
-                          ? idcard
-                          : context.read<PatientFormModel>().idCard.toString(),
-                    ),
+                      // initialValue: (context.read<PatientFormModel>().idCard ==
+                      //         null)
+                      //     ? idcard
+                      //     : context.read<PatientFormModel>().idCard.toString(),
+                    ),ElevatedButton(
+                          // floatingActionButton: FloatingActionButton(
+                            
+                          onPressed:  ()=> _getCheckin(_idcardController.text),
+                          child: Icon(Icons.search),
+                        ),
+                     // Text(_idcardController.text),
+                    // TextFormField(
+                    //   decoration: InputDecoration(
+                    //     border: UnderlineInputBorder(),
+                    //     labelText: 'หมายเลขบัตรประจำตัวประชาชน',
+                    //     labelStyle: TextStyle(
+                    //         color: iBlackColor,
+                    //         fontWeight: FontWeight.w700,
+                    //         fontSize: 23),
+                    //     enabledBorder: UnderlineInputBorder(
+                    //       borderSide: BorderSide(color: iBlueColor),
+                    //     ),
+                    //     focusedBorder: UnderlineInputBorder(
+                    //       borderSide: BorderSide(color: iBlueColor),
+                    //     ),
+                    //   ),
+                    //   keyboardType: TextInputType.number,
+                    //   maxLength: 13,
+                    //   validator: (value) {
+                    //     if (value == null || value.isEmpty) {
+                    //       return 'กรุณาระบุเลขที่บัตรประจำตัวประชาชน';
+                    //     }
+                    //     if (!isNumeric(value)) {
+                    //       return 'กรุณาระบุตัวเลขเท่านั้น';
+                    //     }
+                    //     if (value.length != 13) {
+                    //       return 'กรุณาระบุให้ครบ 13 หลัก';
+                    //     }
+                    //     return null;
+                    //   },
+                    //   onSaved: (value) {
+                    //     _idCard = int.parse(value!);
+                    //   },
+                    //   initialValue: (context.read<PatientFormModel>().idCard ==
+                    //           null)
+                    //       ? idcard
+                    //       : context.read<PatientFormModel>().idCard.toString(),
+                    // ),
+                  
                     TextFormField(
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(),
-                        labelText: 'ชื่อ',
+                        labelText: 'ชื่อ นามสกุล',
+                        
                         labelStyle: TextStyle(
                             color: iBlackColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 23),
+                            fontSize: 20),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
-                      ),
+                      ), controller: _fullnameController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'กรุณาระบุชื่อ';
@@ -131,94 +204,95 @@ class _qrScanState extends State<qrScan> {
                       onSaved: (value) {
                         _firstName = value;
                       },
-                      initialValue: (context.read<PatientFormModel>().firstName ==
-                              null)
-                          ? qrfirstname
-                          : context.read<PatientFormModel>().firstName
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'นามสกุล',
-                        labelStyle: TextStyle(
-                            color: iBlackColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 23),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: iBlueColor),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: iBlueColor),
-                        ),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'กรุณาระบุนามสกุล';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _lastName = value;
-                      },
-                       initialValue: (context.read<PatientFormModel>().lastName ==
-                              null)
-                          ? qrlastname
-                          : context.read<PatientFormModel>().lastName
-                    ),
+                    //   initialValue:  
+                              
+                    //        a.toString()
+                            
+                    )
+                    ,
+                    // TextFormField(
+                    //   decoration: InputDecoration(
+                    //     border: UnderlineInputBorder(),
+                    //     labelText: 'นามสกุล',
+                    //     labelStyle: TextStyle(
+                    //         color: iBlackColor,
+                    //         fontWeight: FontWeight.w700,
+                    //         fontSize: 23),
+                    //     enabledBorder: UnderlineInputBorder(
+                    //       borderSide: BorderSide(color: iBlueColor),
+                    //     ),
+                    //     focusedBorder: UnderlineInputBorder(
+                    //       borderSide: BorderSide(color: iBlueColor),
+                    //     ),
+                    //   ),
+                    //   validator: (value) {
+                    //     if (value == null || value.isEmpty) {
+                    //       return 'กรุณาระบุนามสกุล';
+                    //     }
+                    //     return null;
+                    //   },
+                    //   onSaved: (value) {
+                    //     _lastName = value;
+                    //   },
+                    //    initialValue: (context.read<PatientFormModel>().lastName ==
+                    //           null)
+                    //       ? '${checkin[index].last_name}'
+                    //       : context.read<PatientFormModel>().lastName
+                    // ),
                     
+                  //   TextFormField(
+                  //     decoration: InputDecoration(
+                  //       border: UnderlineInputBorder(),
+                  //       labelText: 'เบอร์โทรศัพท์',                                                                          
+                  //       hintText: 'กรอกเฉพาะตัวเลข 10 หลักติดกันไม่ต้องมีขีดขั้น',
+                  //       labelStyle: TextStyle(
+                  //           color: iBlackColor,
+                  //           fontWeight: FontWeight.w700,
+                  //           fontSize: 23),
+                  //       enabledBorder: UnderlineInputBorder(
+                  //         borderSide: BorderSide(color: iBlueColor),
+                  //       ),
+                  //       focusedBorder: UnderlineInputBorder(
+                  //         borderSide: BorderSide(color: iBlueColor),
+                  //       ),
+                  //     ),
+                  //     keyboardType: TextInputType.number,
+                  //     maxLength: 10,
+                  //     validator: (value) {
+                  //       if (value == null || value.isEmpty) {
+                  //         return 'กรุณาระบุเบอร์โทรศัพท์';
+                  //       }
+                  //       if (!isNumeric(value)) {
+                  //         return 'กรุณาระบุตัวเลขเท่านั้น';
+                  //       }
+                  //       if (value.length != 10) {
+                  //         return 'กรุณาระบุให้ครบ 10 หลัก';
+                  //       }
+                  //       return null;
+                  //     },
+                  //     onSaved: (value) {
+                  //       _phone = (value);
+                  //     },
+                  //  initialValue: (context.read<PatientFormModel>().phone ==
+                  //             null)
+                  //         ? '${checkin[index].}'
+                  //         : context.read<PatientFormModel>().phone
+                  //   ),
                     TextFormField(
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(),
-                        labelText: 'เบอร์โทรศัพท์',                                                                          
-                        hintText: 'กรอกเฉพาะตัวเลข 10 หลักติดกันไม่ต้องมีขีดขั้น',
+                        labelText: 'สถานที่ตรวจ',
                         labelStyle: TextStyle(
                             color: iBlackColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 23),
+                            fontSize: 20),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
-                      ),
-                      keyboardType: TextInputType.number,
-                      maxLength: 10,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'กรุณาระบุเบอร์โทรศัพท์';
-                        }
-                        if (!isNumeric(value)) {
-                          return 'กรุณาระบุตัวเลขเท่านั้น';
-                        }
-                        if (value.length != 10) {
-                          return 'กรุณาระบุให้ครบ 10 หลัก';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _phone = (value);
-                      },
-                   initialValue: (context.read<PatientFormModel>().phone ==
-                              null)
-                          ? qrphone
-                          : context.read<PatientFormModel>().phone
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(),
-                        labelText: 'สถานที่',
-                        labelStyle: TextStyle(
-                            color: iBlackColor,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 23),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: iBlueColor),
-                        ),
-                        focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: iBlueColor),
-                        ),
-                      ),
+                      ), controller: _hospitalController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'กรุณาระบุสถานที่';
@@ -228,10 +302,10 @@ class _qrScanState extends State<qrScan> {
                       onSaved: (value) {
                         _hospital = value;
                       },
-                       initialValue: (context.read<PatientFormModel>().hospital ==
-                              null)
-                          ? qrhospital
-                          : context.read<PatientFormModel>().hospital
+                      //  initialValue: (context.read<PatientFormModel>().hospital ==
+                      //         null)
+                      //     ? ''
+                      //     : context.read<PatientFormModel>().hospital
                     ),TextFormField(
                       decoration: InputDecoration(
                         border: UnderlineInputBorder(),
@@ -239,14 +313,14 @@ class _qrScanState extends State<qrScan> {
                         labelStyle: TextStyle(
                             color: iBlackColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 23),
+                            fontSize: 20),
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
                         focusedBorder: UnderlineInputBorder(
                           borderSide: BorderSide(color: iBlueColor),
                         ),
-                      ),
+                      ),controller: _checkdateController,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'กรุณาระบุวันที่';
@@ -256,10 +330,10 @@ class _qrScanState extends State<qrScan> {
                       onSaved: (value) {
                         _checkindate = value;
                       },
-                       initialValue: (context.read<PatientFormModel>().checkindate ==
-                              null)
-                          ? qrdateappointment
-                          : context.read<PatientFormModel>().checkindate
+                      //  initialValue: (context.read<PatientFormModel>().checkindate ==
+                      //         null)
+                      //     ? ''
+                      //     : context.read<PatientFormModel>().checkindate
                     ),SizedBox(width: 20, height: 50),
                     Container(
                       // margin: EdgeInsets.only(top: 280),
@@ -302,11 +376,11 @@ class _qrScanState extends State<qrScan> {
         
                                 //add to State
                              listpatient.add(BookingHospitelItem(
-                               idCard: _idCard!,
-                              fullname:  _firstName! + _lastName!,
-                              phone: _phone!,
-                              checkindate:  '',
-                              hospital:  _hospital!,
+                               idCard: int.parse(_idcardController.text),
+                              fullname:  _fullnameController.text,
+                              phone:'',
+                              checkindate:  DateTime.now().toString(),
+                              hospital:  _hospitalController.text,
                               hospitel: '',
                               startdateadmit:DateTime.now().toString(),
                               enddateadmit:'',
@@ -323,12 +397,12 @@ class _qrScanState extends State<qrScan> {
                                   BookingHospitelController(service);
                               controller.addBookingHospitel(new BookingHospitelItem(
                                   
-                                  idCard:_idCard!,
-                                  fullname:'${_firstName} '  '${_lastName}',
-                                  hospital: _hospital.toString(),
-                                  checkindate: _checkindate.toString(),
+                                  idCard:int.parse(_idcardController.text),
+                                  fullname:_fullnameController.text,
+                                  hospital:_hospitalController.text,
+                                  checkindate: _checkdateController.text,
                                    hospitel: '',
-                                   phone:_phone.toString(),
+                                   phone:'',
                                   startdateadmit: DateTime.now().toString(),
                                   enddateadmit: '',
                                   status: ''));
@@ -355,7 +429,8 @@ class _qrScanState extends State<qrScan> {
                             style: TextStyle(fontSize: 20, color: iWhiteColor)),
                       ),
                     ),
-                    Text(qrString),
+                   // Text(qrString),
+                   SizedBox(width: 20, height: 200),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -367,22 +442,26 @@ class _qrScanState extends State<qrScan> {
                       ],
                     )
                   ])),
-        ));
+        )),);
+    
   }
+}
+
+
 
   Future<void> scanQR() async {
-    try {
-      FlutterBarcodeScanner.scanBarcode("#2A99CF", "Cancle", true, ScanMode.QR)
-          .then((value) {
-        setState(() {
-          qrString = value;
-          print(qrString);
-          //qrString = "panita tharaphom";
-        });
-      });
-    } catch (e) {
-      setState(() {});
-    }
+    // try {
+    //   FlutterBarcodeScanner.scanBarcode("#2A99CF", "Cancle", true, ScanMode.QR)
+    //       .then((value) {
+    //     setState(() {
+    //       qrString = value;
+    //       print(qrString);
+    //       //qrString = "panita tharaphom";
+    //     });
+    //   });
+    // } catch (e) {
+    //   setState(() {});
+    // }
   }
 
   bool isNumeric(String value) {
@@ -395,7 +474,7 @@ class _qrScanState extends State<qrScan> {
     }
     return true;
   }
-}
+
 
 void _showDialog(BuildContext context) {
   showDialog(

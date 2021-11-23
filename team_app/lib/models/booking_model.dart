@@ -21,6 +21,18 @@ class Booking {
       json['fullName'] as String,
     );
   }
+
+
+  factory Booking.fromJson(
+    Map<String, Object?> json,
+  ) {
+    return Booking(
+      json['hospitalName'] as String,
+      json['checkDate'] as String,
+      json['result'] as String,
+      json['fullName'] as String,
+    );
+  }
 }
 
 class AllBookings {
@@ -36,6 +48,17 @@ class AllBookings {
 }
 
 
+class SingleBooking {
+  final Booking booking;
+  SingleBooking(this.booking);
+
+  factory SingleBooking.fromJson(QuerySnapshot s) {
+    var booking = s.docs.map((DocumentSnapshot ds) {
+      return Booking.fromJson(ds.data() as Map<String, dynamic>);
+    });
+    return SingleBooking(booking.first);
+  }
+}
 //State
 class BookingModel extends ChangeNotifier {
   int? _id_card;

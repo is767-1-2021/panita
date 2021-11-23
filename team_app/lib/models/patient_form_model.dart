@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:icovid/models/booking_class_model.dart';
 import 'package:icovid/pages/hospital_booking_list.dart';
 import 'patient_class.dart';
 
@@ -33,7 +34,6 @@ class BookingHospitel {
     );
   }
 }
-
 class AllBookingHospitel {
   final List<BookingHospitel> bookings;
   AllBookingHospitel(this.bookings);
@@ -45,6 +45,51 @@ class AllBookingHospitel {
     return AllBookingHospitel(bookingsHospitel);
   }
 }
+
+
+
+// CheckinList
+
+class BookingHospitelList {
+   String hospitalName;
+  String checkDate;
+  String result;
+  String fullName;
+  int hospitalNumber;
+  String idCardNumber;
+  int bookingNumber;
+ 
+
+  BookingHospitelList(this.hospitalName, this.checkDate, this.result, this.fullName,
+      this.hospitalNumber, this.idCardNumber, this.bookingNumber);
+
+  factory BookingHospitelList.fromDs(
+    Map<String, Object?> json,
+  ) {
+    return BookingHospitelList(
+      json['hospitalName'] as String,
+      json['checkDate'] as String,
+      json['result'] as String,
+      json['fullName'] as String,
+      json['hospitalNumber'] as int,
+      json['idCardNumber'] as String,
+      json['bookingNumber'] as int,
+    );
+  }
+}
+
+class AllBookingHospitelList {
+  final List<BookingHospitelList> bookings;
+  AllBookingHospitelList(this.bookings);
+
+  factory AllBookingHospitelList.fromSnapshot(QuerySnapshot s) {
+    List<BookingHospitelList> bookingsHospitel = s.docs.map((DocumentSnapshot ds) {
+      return BookingHospitelList.fromDs(ds.data() as Map<String, dynamic>);
+    }).toList();
+    return AllBookingHospitelList(bookingsHospitel);
+  }
+}
+
 
 class PatientFormModel with ChangeNotifier {
   // ใช้อันนี้

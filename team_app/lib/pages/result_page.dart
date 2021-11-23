@@ -18,7 +18,12 @@ class _Result_PageState extends State<Result_Page> {
   final formKey = GlobalKey<FormState>();
   String hopitel = " ";
   String hopitelid = "กรุณาเลือก";
-  List hopitelist = ['กรุณาเลือก','โรงแรมธรี สุขุวิท', 'โรงแรมแอนดา', 'โรงแรมไฮ โฮเท็ล'];
+  List hopitelist = [
+    'กรุณาเลือก',
+    'โรงแรมธรี สุขุวิท',
+    'โรงแรมแอนดา',
+    'โรงแรมไฮ โฮเท็ล'
+  ];
   var service = FirebaseServiceHospitel();
   var controller;
   _Result_PageState() {
@@ -43,15 +48,14 @@ class _Result_PageState extends State<Result_Page> {
                   color: iWhiteColor),
             ),
             backgroundColor: iBlueColor),
-        body:
-            Consumer<PatientFormModelHospitel>(builder: (context, form, child) {
+        body: Consumer<PatientFormModel>(builder: (context, form, child) {
           return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Card(
-                child: Form(
-              key: formKey,
-              child: SingleChildScrollView(
-                child: Column(children: [
+              padding: const EdgeInsets.all(20.0),
+              child: Card(
+                  child: Form(
+                key: formKey,
+                child: SingleChildScrollView(
+                    child: Column(children: [
                   Container(
                       child: Padding(
                     padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
@@ -88,38 +92,38 @@ class _Result_PageState extends State<Result_Page> {
                           ),
                         ]),
                   )),
-                  Container(
-                      child: Padding(
-                    padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Text("เบอร์โทรศัพท์ : ",
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w700)),
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Row(children: <Widget>[
-                                Consumer<PatientFormModel>(
-                                  builder: (context, form, child) {
-                                    return Text(
-                                      '${form.phone} ',
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.black),
-                                    );
-                                  },
-                                ),
-                              ])
-                            ],
-                          ),
-                        ]),
-                  )),
+                  // Container(
+                  //     child: Padding(
+                  //   padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
+                  //   child: Row(
+                  //       mainAxisAlignment: MainAxisAlignment.start,
+                  //       children: <Widget>[
+                  //         Column(
+                  //           children: <Widget>[
+                  //             Text("เบอร์โทรศัพท์ : ",
+                  //                 style: TextStyle(
+                  //                     fontSize: 20,
+                  //                     color: Colors.black,
+                  //                     fontWeight: FontWeight.w700)),
+                  //           ],
+                  //         ),
+                  //         Column(
+                  //           children: <Widget>[
+                  //             Row(children: <Widget>[
+                  //               Consumer<PatientFormModelHospitel>(
+                  //                 builder: (context, form, child) {
+                  //                   return Text(
+                  //                     '${form.phone} ',
+                  //                     style: TextStyle(
+                  //                         fontSize: 18, color: Colors.black),
+                  //                   );
+                  //                 },
+                  //               ),
+                  //             ])
+                  //           ],
+                  //         ),
+                  //       ]),
+                  // )),
                   Container(
                       child: Padding(
                     padding: const EdgeInsets.only(top: 12.0, bottom: 12.0),
@@ -174,7 +178,7 @@ class _Result_PageState extends State<Result_Page> {
                                 //  SizedBox(
                                 // height: 50,
                                 // width: 250,
-                                Consumer<PatientFormModel>(
+                                Consumer<PatientFormModelHospitel>(
                                   builder: (context, form, child) {
                                     return Text(
                                       '${form.hospital}',
@@ -209,7 +213,7 @@ class _Result_PageState extends State<Result_Page> {
                                 //  SizedBox(
                                 // height: 50,
                                 // width: 250,
-                                Consumer<PatientFormModel>(
+                                Consumer<PatientFormModelHospitel>(
                                   builder: (context, form, child) {
                                     //String dateappointment = DateFormat('dd-MM-yyyy').format(form.dateappointment);
                                     return Text(
@@ -244,7 +248,8 @@ class _Result_PageState extends State<Result_Page> {
                   ),
                   Container(
                     child: Row(children: <Widget>[
-                      Row( mainAxisAlignment: MainAxisAlignment.center,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           //  SizedBox(
                           // height: 50,
@@ -273,97 +278,101 @@ class _Result_PageState extends State<Result_Page> {
                       ),
                     ]),
                   ),
-                  Container( 
-                    width: MediaQuery.of(context).size.width,height: 60,
-                      child:
-                        ElevatedButton(
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              formKey.currentState!.save();
-
-                              List<Patient> Listpatient = [];
-                              // print('${form.firstName}');
-                              // print('${form.lastName}');
-                              // print('${form.phone}');
-
-                              if (context
-                                      .read<PatientFormModelHospitel>()
-                                      .patientList !=
-                                  null) {
-                                print('||||');
-                                Listpatient = context
-                                    .read<PatientFormModelHospitel>()
-                                    .patientList;
-                              }
-
-                              //update hospitel
-                              controller.updateHospitel(
-                                  form.idCard, '${form.checkindate}', hopitel);
-
-                              controller.updateResultPatient(
-                                  //   form.idCard,  "แก้ตรงนี้ยยยยยยยยยยยยยยย"
-                                  //  '${form.checkindate}');
-                                  1111111111111,
-                                  '20/11/2021');
-
-                              Listpatient.add(Patient(
-                                  idCard: form.idCard,
-                                  firstName: '${form.firstName}',
-                                  lastName: '${form.lastName}',
-                                  phone: '${form.phone}',
-                                  checkindate: '${form.checkindate}'));
-
-                              // context
-                              //     .read<PatientFormModelHospitel>()
-                              //     .patientList = Listpatient;
-                             
-                            }  _showDialog(context);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        HospitalHomeScreen()));
-                            const SnackBar(content: Text('บันทึกผลเรียบร้อย'));
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: iBlueColor,
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0),
-                            ),
-                          ),
-                          child: Text('ติดเชื้อ',
-                              style:
-                                  TextStyle(fontSize: 20, color: iWhiteColor)),
-                        )
-                      ),
-
-                 SizedBox(
-  width: 20.0,
-  height: 30.0,
-  
-),
-                    Container( width: MediaQuery.of(context).size.width,height: 60,
+                  Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 60,
                       child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HospitalHomeScreen()));
-                      const SnackBar(content: Text('บันทึกผลเรียบร้อย'));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: iBlueColor,
-                      shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0),
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            formKey.currentState!.save();
+
+                            List<Patient> Listpatient = [];
+                            // print('${form.firstName}');
+                            // print('${form.lastName}');
+                            // print('${form.phone}');
+
+                            if (context
+                                    .read<PatientFormModelHospitel>()
+                                    .patientList !=
+                                null) {
+                              print('||||');
+                              Listpatient = context
+                                  .read<PatientFormModelHospitel>()
+                                  .patientList;
+                            }
+
+                            //update hospitel
+                            controller.updateHospitel(
+                                form.idCard, '${form.checkindate}', hopitel);
+
+                            controller.updateResultPatient(
+                                form.idCard, //"แก้ตรงนี้ยยยยยยยยยยยยยยย"
+                                //  '${form.checkindate}');
+                                // 1111111111111,
+                                '${form.checkindate}',
+                                'ติดเชื้อ');
+
+                            Listpatient.add(Patient(
+                                idCard: form.idCard,
+                                firstName: '${form.firstName}',
+                                lastName: '${form.lastName}',
+                                phone: '${form.phone}',
+                                checkindate: '${form.checkindate}'));
+
+                            // context
+                            //     .read<PatientFormModelHospitel>()
+                            //     .patientList = Listpatient;
+
+                          }
+                          _showDialog(context);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HospitalHomeScreen()));
+                          const SnackBar(content: Text('บันทึกผลเรียบร้อย'));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: iBlueColor,
+                          shape: new RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(30.0),
+                          ),
+                        ),
+                        child: Text('ติดเชื้อ',
+                            style: TextStyle(fontSize: 20, color: iWhiteColor)),
+                      )),
+
+                  SizedBox(
+                    width: 20.0,
+                    height: 30.0,
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: () {
+                          controller.updateResultPatient(
+                                     form.idCard,  //"แก้ตรงนี้ยยยยยยยยยยยยยยย"
+                                  //  '${form.checkindate}');
+                                 // 1111111111111,
+                                 '${form.checkindate}','ไม่ติดเชื้อ');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HospitalHomeScreen()));
+                        const SnackBar(content: Text('บันทึกผลเรียบร้อย'));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: iBlueColor,
+                        shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0),
+                        ),
                       ),
+                      child: Text('ไม่ติดเชื้อ',
+                          style: TextStyle(fontSize: 20, color: iWhiteColor)),
                     ),
-                    child: Text('ไม่ติดเชื้อ',
-                        style: TextStyle(fontSize: 20, color: iWhiteColor)),
-                  )
-              ,
-              ),
-                 ] )),)));
-          
+                  ),
+                ])),
+              )));
         }));
   }
 }
@@ -378,8 +387,10 @@ void _showDialog(BuildContext context) {
         actions: [
           ElevatedButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HospitalHomeScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HospitalHomeScreen()));
               },
               child: Text('ตกลง'))
         ],
