@@ -2,20 +2,84 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:icovid/constants/color_constant.dart';
+import 'package:icovid/controller/hospitel_controller.dart';
 import 'package:icovid/models/patient_class_hospitel.dart';
+import 'package:icovid/models/patient_form_model.dart';
 import 'package:icovid/models/patient_form_model_hospitel.dart';
+import 'package:icovid/pages/hospital_booking_list.dart';
+import 'package:icovid/pages/hospital_home_page.dart';
+import 'package:icovid/services/hospitel_service.dart';
 import 'package:provider/provider.dart';
 
 import 'login_page.dart';
 
 class PatientListPage extends StatefulWidget {
+  var service = FirebaseServiceHospitelPatient();
+  var controller;
+  PatientListPage() {
+    controller = HospitelController(service);
+  }
+  
   @override
   _PatientListPageState createState() => _PatientListPageState();
 }
 
 class _PatientListPageState extends State<PatientListPage> {
-    List<PatientHospitel> _patientList = [];
-    
+    List<BookingHospitel> _patientList = List.empty();
+  bool isLoading = false;
+
+@override
+  void initState() {
+    super.initState();
+    setState(() {});
+    widget.controller.onSync
+        .listen((bool syncState) => setState(() => isLoading = syncState));
+        _getHospitel();
+  }
+
+  void _getHospitel() async {
+    var hospitellist = await widget.controller.fecthHospitelList();
+    setState(() {
+      _patientList = hospitellist;
+    });
+  }
+
+
+Widget get body => isLoading
+      ? CircularProgressIndicator()
+      : ListView.builder(
+        itemCount: _patientList.isEmpty ? 1 : _patientList.length,
+        itemBuilder: (context,  index) {
+           if (_patientList.isEmpty) {
+              return Text('ไม่พบรายการผู้เข้ารับการตรวจ');
+            }
+
+          return Card(
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 30,
+                child: FittedBox(
+                  child: Text('${index+1}',
+                    style: TextStyle(color: iWhiteColor,fontSize: 20),
+                  ),
+                ),
+              ),
+              title: Text('${_patientList[index].fullname}'),
+              subtitle: Text('${_patientList[index].startdateadmit}'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>  HospitelDetail(items: _patientList[index]),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      );
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,130 +108,31 @@ class _PatientListPageState extends State<PatientListPage> {
         //   )),
         // ),
       ),
-      body: PatientSearch(),
+      body: Center(
+        child: body,
+    ),
     );
   }
+
+
 }
 
-
-class PatientSearch extends StatefulWidget {
+class HospitelDetail extends StatelessWidget {
+  
+  final BookingHospitel items;
+  const HospitelDetail({Key? key, required this.items}) : super(key: key);
+  
   @override
-  _PatientSearchState createState() => _PatientSearchState();
-}
+  Widget build(BuildContext context) {
+    
+var service = FirebaseServiceHospitelPatient();
+  var controller;
+  HospitelDetail() {
+    controller = HospitelController(service);
+  }
 
-class _PatientSearchState extends State<PatientSearch> {
-
-  // getItemAndNavigate(String item, BuildContext context) {
-  //   Navigator.push(context,
-  //       MaterialPageRoute(builder: (context) => StatusForm(itemHolder: item)));
-  // }
-
-  // List<Map<String, dynamic>> _foundPatient = [];
-
-  // @override
-  // initState() {
-  //   _foundPatient = _allPatient;
-  //   super.initState();
-  // }
-
-  // void _runFilter(String enteredKeyword) {
-  //   List<Map<String, dynamic>> results = [];
-
-  //   if (enteredKeyword.isEmpty) {
-  //     results = _allPatient;
-  //   } else {
-  //     results = _allPatient
-  //         .where((user) =>
-  //             user["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
-  //         .toList();
-  //   }
-
-  //   setState(() {
-  //     _foundPatient = results;
-  //   });
-  // }
-
+   final TextEditingController _enddateadmitController = new TextEditingController();
  
-  @override
-  Widget build(BuildContext context) {
-    List<PatientHospitel> _patientList = [];
-    if (context.read<PatientFormModelHospitel>().patientList != null) {
-      _patientList = context.read<PatientFormModelHospitel>().patientList;
-    }
-    return Scaffold(
-      // body: Center(
-      //   child: Padding(
-      //     padding: const EdgeInsets.all(10),
-      //     child: Column(
-      //       children: [
-      //         SizedBox(
-      //           height: 20,
-      //         ),
-      //         TextField(
-      //           onChanged: (value) => _runFilter(value),
-      //           decoration: InputDecoration(
-      //               hintText: "Enter patient name",
-      //               hintStyle: TextStyle(color: Colors.amber),
-      //               labelText: 'Search Patient',
-      //               floatingLabelBehavior: FloatingLabelBehavior.always,
-      //               border: OutlineInputBorder(
-      //                 borderRadius: BorderRadius.circular(20),
-      //               ),
-      //               suffixIcon: Icon(Icons.search)),
-      //         ),
-
-               body: 
-               ListView.builder(
-        itemCount: _patientList.length,
-        itemBuilder: (context, int index) {
-          //User data = provider.users[index];
-          return Dismissible(
-            key: ValueKey(_patientList[index]),
-            onDismissed: (direction) {
-              // Remove the item from the data source.
-              setState(() {
-                //UserProvider().RemoveUserList(_userList[index]);
-                _patientList.removeAt(index);
-              });
-
-              // Then show a snackbar.
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text('${_patientList[index].lastName} ถูกลบ')));
-            },
-            // Show a red background as the item is swiped away.
-            background: Container(color: Colors.red),
-            child: Card(
-              child: ListTile(
-                leading: CircleAvatar(
-                  radius: 30,
-                  child: FittedBox(
-                    child: Icon(Icons.person),
-                  ),
-                ),
-                title: Text('${_patientList[index].firstName}'' ''${_patientList[index].lastName}'),
-                subtitle: Text('${_patientList[index].dateappointment}'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PatientDetail(Patients: _patientList[index]),
-                    ),
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class PatientDetail extends StatelessWidget {
-  final PatientHospitel Patients;
-  const PatientDetail({Key? key, required this.Patients}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('รายละเอียดผู้เข้ารับการรักษา'),
@@ -204,7 +169,7 @@ class PatientDetail extends StatelessWidget {
                   borderSide: BorderSide(color: iBlueColor),
                 ),
               ),
-              initialValue: '${Patients.firstName}'  '${Patients.lastName}',
+              initialValue: '${items.fullname}' ,
             ),
             TextFormField(
               decoration: InputDecoration(
@@ -222,26 +187,9 @@ class PatientDetail extends StatelessWidget {
                   borderSide: BorderSide(color: iBlueColor),
                 ),
               ),
-              initialValue: '${Patients.dateappointment}',
+              initialValue: '${items.checkindate}',
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                border: UnderlineInputBorder(),
-                enabled: false,
-                labelText: 'เบอร์โทรศัพท์ผู้ป่วย',
-                labelStyle: TextStyle(
-                    color: iBlackColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: iBlueColor),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: iBlueColor),
-                ),
-              ),
-              initialValue: '${Patients.phone}',
-            ),
+            
             // TextFormField(
             //   decoration: InputDecoration(
             //     border: UnderlineInputBorder(),
@@ -277,12 +225,13 @@ class PatientDetail extends StatelessWidget {
                   borderSide: BorderSide(color: iBlueColor),
                 ),
               ),
-              initialValue: '${Patients.dateappointment}',
+              initialValue: '${items.startdateadmit}',
             ), 
             TextFormField(
+              controller: _enddateadmitController,
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
-                enabled: false,
+                //enabled: false,
                 labelText: 'วันที่ออกการรักษา',
                 labelStyle: TextStyle(
                     color: iBlackColor,
@@ -299,39 +248,15 @@ class PatientDetail extends StatelessWidget {
             ),ElevatedButton(
                             
                             onPressed: () {
-                              // if (formKey.currentState!.validate()) {
-                              //   formKey.currentState!.save();
-
-                              //   List<Patient> Listpatient = [];
-                              //   print('${form.firstName}');
-                              //   print('${form.lastName}');
-                              //   print('${form.phone}');
-
-                              //   if (context
-                              //           .read<PatientFormModel>()
-                              //           .patientList !=
-                              //       null) {
-                              //     print('||||');
-                              //     Listpatient = context
-                              //         .read<PatientFormModel>()
-                              //         .patientList;
-                              //   }
-                              //   Listpatient.add(Patient(
-                              //       idCard: 11,
-                              //       firstName: '${form.firstName}',
-                              //       lastName: '${form.lastName}',
-                              //       phone: '${form.phone}',
-                              //       dateappointment:
-                              //           '${form.dateappointment}'));
-
-                              //   context.read<PatientFormModel>().patientList =
-                              //       Listpatient;
-                              //   // _showDialog(context);
-                              
+                            
+                               controller.updateHospitel(
+                                items.idcard, '${items.checkindate}','${_enddateadmitController.text}',);
+                             
                              Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PatientListPage()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HospitalHomeScreen()));
+             
                         }, style: ElevatedButton.styleFrom(
                         primary: iBlueColor,
                         shape: new RoundedRectangleBorder(

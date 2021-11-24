@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:icovid/constants/color_constant.dart';
 import 'package:icovid/controller/booking_hospitel_controller.dart';
@@ -10,9 +9,8 @@ import 'package:provider/provider.dart';
 import 'login_page.dart';
 import 'result_page.dart';
 
-
 class HospitalBookingsList extends StatefulWidget {
-var service = FirebaseServiceHospitel();
+  var service = FirebaseServiceHospitel();
   var controller;
   HospitalBookingsList() {
     controller = BookingHospitelController(service);
@@ -22,16 +20,16 @@ var service = FirebaseServiceHospitel();
 }
 
 class _HospitalBookingsListState extends State<HospitalBookingsList> {
-List<BookingHospitelList> checkin = List.empty();
+  List<BookingHospitelList> checkin = List.empty();
   bool isLoading = false;
 
-@override
+  @override
   void initState() {
     super.initState();
     setState(() {});
     widget.controller.onSync
         .listen((bool syncState) => setState(() => isLoading = syncState));
-        _getCheckin();
+    _getCheckin();
   }
 
   void _getCheckin() async {
@@ -41,68 +39,67 @@ List<BookingHospitelList> checkin = List.empty();
     });
   }
 
-
-Widget get body => isLoading
+  Widget get body => isLoading
       ? CircularProgressIndicator()
       : ListView.builder(
-        itemCount: checkin.isEmpty ? 1 : checkin.length,
-        itemBuilder: (context,  index) {
-           if (checkin.isEmpty) {
+          itemCount: checkin.isEmpty ? 1 : checkin.length,
+          itemBuilder: (context, index) {
+            if (checkin.isEmpty) {
               return Text('ไม่พบรายการผู้เข้ารับการตรวจ');
             }
-          return Card(
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 30,
-                child: FittedBox(
-                  child: Text('${index+1}',
-                    style: TextStyle(color: iWhiteColor,fontSize: 20),
+            return Card(
+              child: ListTile(
+                leading: CircleAvatar(
+                  radius: 30,
+                  child: FittedBox(
+                    child: Text(
+                      '${index + 1}',
+                      style: TextStyle(color: iWhiteColor, fontSize: 20),
+                    ),
                   ),
                 ),
+                title: Text('${checkin[index].fullName}'),
+                subtitle: Text('${checkin[index].checkDate}'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          PatientDetail(items: checkin[index]),
+                    ),
+                  );
+                },
               ),
-              title: Text('${checkin[index].fullName}'),
-              subtitle: Text('${checkin[index].checkDate}'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>  PatientDetail(items: checkin[index]),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      );
+            );
+          },
+        );
 
   @override
   Widget build(BuildContext context) {
-  
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'รายชื่อผู้เข้ารับการตรวจ',
-              style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'รายชื่อผู้เข้ารับการตรวจ',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.logout),
-              iconSize: 28.0,
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LogInScreen())
-                );
-              },
-            ),
-          ],
-          backgroundColor: Color(0xFF473F97),
         ),
-        //
-        body: Center(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            iconSize: 28.0,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LogInScreen()));
+            },
+          ),
+        ],
+        backgroundColor: Color(0xFF473F97),
+      ),
+      //
+      body: Center(
         child: body,
       ),
     );
@@ -115,7 +112,6 @@ class PatientDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         title: Text('รายละเอียดผู้เข้ารับการตรวจ'),
@@ -133,9 +129,9 @@ class PatientDetail extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0), 
-       
-            //key: formKey,
+        padding: const EdgeInsets.all(20.0),
+
+        //key: formKey,
         child: Column(
           children: [
             TextFormField(
@@ -192,7 +188,6 @@ class PatientDetail extends StatelessWidget {
               ),
               initialValue: '${items.checkDate}',
             ),
-            
             TextFormField(
               decoration: InputDecoration(
                 border: UnderlineInputBorder(),
@@ -211,58 +206,51 @@ class PatientDetail extends StatelessWidget {
               ),
               initialValue: '${items.hospitalName}',
             ),
-            
             SizedBox(
-  width: 20.0,
-  height: 30.0,
-  
-),
-                        Container(
-                    // margin: EdgeInsets.only(top: 280),
-                    width: MediaQuery.of(context).size.width,height: 60,
-                    child: ElevatedButton(
-                      // BorderRadius: new BorderRadius.circular(30.0),
+              width: 20.0,
+              height: 30.0,
+            ),
+            Container(
+              // margin: EdgeInsets.only(top: 280),
+              width: MediaQuery.of(context).size.width, height: 60,
+              child: ElevatedButton(
+                // BorderRadius: new BorderRadius.circular(30.0),
 
-                      //height: 60,
-                      // color: iBlueColor,
-                      onPressed: () { 
-        
+                //height: 60,
+                // color: iBlueColor,
+                onPressed: () {
+                  //รับค่าจาก ProfileModel -> TextFormField -> BookingModel
+                  // context.read<PatientFormModelHospitel>().idCard = items.idcard;
+                  context.read<PatientFormModelHospitel>().firstName =
+                      '${items.fullName}';
+                  // context.read<PatientFormModelHospitel>().lastName =
+                  // '${items.fullname}';
+                  context.read<PatientFormModelHospitel>().hospital =
+                      '${items.hospitalName}';
+                  // context.read<PatientFormModelHospitel>().phone = '${items.phone}';
+                  context.read<PatientFormModelHospitel>().checkindate =
+                      '${items.checkDate}';
 
-                          //รับค่าจาก ProfileModel -> TextFormField -> BookingModel
-                        // context.read<PatientFormModelHospitel>().idCard = items.idcard;
-                          context.read<PatientFormModelHospitel>().firstName =
-                              '${items.fullName}';
-                              // context.read<PatientFormModelHospitel>().lastName =
-                              // '${items.fullname}';
-                          context.read<PatientFormModelHospitel>().hospital = '${items.hospitalName}';
-                         // context.read<PatientFormModelHospitel>().phone = '${items.phone}';
-                          context.read<PatientFormModelHospitel>().checkindate = '${items.checkDate}';
+                  List<PatientFormModelHospitel> Listpatient = [];
+                  if (context.read<PatientFormModelHospitel>().patientList !=
+                      null) {
+                    Listpatient =
+                        context.read<PatientFormModelHospitel>().patientList;
+                  }
 
-
-
-                           List<PatientFormModelHospitel> Listpatient = [];
-                           if (context.read<PatientFormModelHospitel>().patientList != null) {
-                          
-                          Listpatient = context.read<PatientFormModelHospitel>().patientList;
-                        }
-       
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Result_Page()));
-                        
-                        }
-                      ,
-                      style: ElevatedButton.styleFrom(
-                        primary: iBlueColor,
-                        shape: new RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(30.0),
-                        ),
-                      ),
-                      child: Text('บันทึกผลการตรวจ',
-                          style: TextStyle(fontSize: 20, color: iWhiteColor)),
-                    ),
-                  )
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Result_Page()));
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: iBlueColor,
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0),
+                  ),
+                ),
+                child: Text('บันทึกผลการตรวจ',
+                    style: TextStyle(fontSize: 20, color: iWhiteColor)),
+              ),
+            )
           ],
         ),
       ),
@@ -279,7 +267,7 @@ class BookingHospitelItem {
   final String status;
   final String hospital;
   final String phone;
-final String checkindate;
+  final String checkindate;
 
   const BookingHospitelItem({
     Key? key,
@@ -289,9 +277,9 @@ final String checkindate;
     required this.startdateadmit,
     required this.enddateadmit,
     required this.status,
-     required this.hospital,
-     required this.checkindate,
-     required this.phone,
+    required this.hospital,
+    required this.checkindate,
+    required this.phone,
   });
 
   add(Map<String, String> map) {}

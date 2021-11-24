@@ -21,6 +21,7 @@ class FirebaseServiceHospitel extends BookingHospitelServices {
    Future<Booking> getCheckin(String idcard) async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('icovid_booking')
     .where('idCardNumber', isEqualTo: idcard)
+    
         //.orderBy('bookingNumber', descending: false)
         .get();
 print('ssss'+idcard);
@@ -32,6 +33,7 @@ print('ssss'+idcard);
  //Future<List<BookingHospitel>> getCheckin(String hospital) async {
    Future<List<BookingHospitelList>> getCheckinList() async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('icovid_booking')
+    .where('isActive', isEqualTo: true)
      //.where('hospital', isEqualTo: hospital)
         //.orderBy('bookingNumber', descending: false)
         .get();

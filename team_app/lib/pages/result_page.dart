@@ -78,7 +78,7 @@ class _Result_PageState extends State<Result_Page> {
                           Column(
                             children: <Widget>[
                               Row(children: <Widget>[
-                                Consumer<PatientFormModelHospitel>(
+                                Consumer<PatientFormModel>(
                                   builder: (context, form, child) {
                                     return Text(
                                       '${form.firstName}',
@@ -178,7 +178,7 @@ class _Result_PageState extends State<Result_Page> {
                                 //  SizedBox(
                                 // height: 50,
                                 // width: 250,
-                                Consumer<PatientFormModelHospitel>(
+                                Consumer<PatientFormModel>(
                                   builder: (context, form, child) {
                                     return Text(
                                       '${form.hospital}',
@@ -213,7 +213,7 @@ class _Result_PageState extends State<Result_Page> {
                                 //  SizedBox(
                                 // height: 50,
                                 // width: 250,
-                                Consumer<PatientFormModelHospitel>(
+                                Consumer<PatientFormModel>(
                                   builder: (context, form, child) {
                                     //String dateappointment = DateFormat('dd-MM-yyyy').format(form.dateappointment);
                                     return Text(
