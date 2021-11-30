@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "263628643754",
+    "project_id": "is767-2021-panita",
+    "storage_bucket": "is767-2021-panita.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:263628643754:android:1a7904525722211b9b9fd3",
+        "android_client_info": {
+          "package_name": "com.example.final_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "263628643754-6i592b8o77od7b1is8nfvjtgoi8g9i2f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDV6Hfvco5Hl8FRVy73Qh5T4aPyg7236LU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "263628643754-6i592b8o77od7b1is8nfvjtgoi8g9i2f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
